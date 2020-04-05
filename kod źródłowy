@@ -89,7 +89,6 @@ int main()
     do{
         scanf(" %c",&ktoZaczyna);
     } while (ktoZaczyna!=49 && ktoZaczyna!=50);
-    char kolej = ktoZaczyna==1+'0' ? CZLOWIEK : AI;
     char pola[9]={' ',' ',' ',' ',' ',' ',' ',' ',' '};
     char ruch;
     char win;
@@ -104,9 +103,9 @@ int main()
     }
     zaktualizujPlansze(pola);
     int najlepszyWynik=-100;
-    while(1) {
+    for(;;ktoZaczyna++) {
         najlepszyWynik=-100;
-        if(kolej==CZLOWIEK) {
+        if(ktoZaczyna%2) {
             do{
                 scanf(" %c",&ruch);
             } while(pola[ruch-'0']!=' ' || ruch<48 || ruch>56);
@@ -118,20 +117,18 @@ int main()
                     pola[i] = ' ';
                     if (wynik > najlepszyWynik) {
                         najlepszyWynik = wynik;
-                        ruch = i+'0';
+                        ruch = i;
                     }
                 }
             }
+            pola[ruch]=AI;
         }
-        pola[ruch-'0']=kolej;
+        if(ktoZaczyna%2) {
+            pola[ruch-'0']=CZLOWIEK;
+        }
         zaktualizujPlansze(pola);
         if((win=zwyciezca(pola))!=' '){
             break;
-        }
-        if(kolej==CZLOWIEK){
-            kolej=AI;
-        } else {
-            kolej=CZLOWIEK;
         }
     }
     if(win=='r'){
