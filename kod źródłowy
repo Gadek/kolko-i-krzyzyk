@@ -102,14 +102,13 @@ int main()
         }
     }
     zaktualizujPlansze(pola);
-    int najlepszyWynik=-100;
-    for(;;ktoZaczyna++) {
-        najlepszyWynik=-100;
+    for(;(win=zwyciezca(pola))==' ' ; ktoZaczyna++) {
         if(ktoZaczyna%2) {
             do{
                 scanf(" %c",&ruch);
             } while(pola[ruch-'0']!=' ' || ruch<48 || ruch>56);
         } else {
+            int najlepszyWynik=-100;
             for (int i = 0; i < 9; i++) {
                 if (pola[i] == ' ') {
                     pola[i] = AI;
@@ -127,9 +126,6 @@ int main()
             pola[ruch-'0']=CZLOWIEK;
         }
         zaktualizujPlansze(pola);
-        if((win=zwyciezca(pola))!=' '){
-            break;
-        }
     }
     if(win=='r'){
         printf("Remis\n");
