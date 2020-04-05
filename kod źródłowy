@@ -1,0 +1,143 @@
+#include <stdio.h>
+#define CZLOWIEK 'o'
+#define AI 'x'
+char r[9][9];
+void zaktualizujPlansze(char pola[]) {
+    printf("\e[1;1H\e[2J");
+    for(int i=0; i<9; i++) {
+        if(pola[i]==CZLOWIEK){
+            r[i][4]=r[i][1]='_'; r[i][3]=r[i][5]='|';
+        } else if(pola[i]==AI){
+            r[i][0]=r[i][8]='\\'; r[i][2]=r[i][6]='/';r[i][4]='X';
+        }
+    }
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[0][0],r[0][1],r[0][2],r[1][0],r[1][1],r[1][2],r[2][0],r[2][1],r[2][2]);
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[0][3],r[0][4],r[0][5],r[1][3],r[1][4],r[1][5],r[2][3],r[2][4],r[2][5]);
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[0][6],r[0][7],r[0][8],r[1][6],r[1][7],r[1][8],r[2][6],r[2][7],r[2][8]);
+    printf("------------\n");
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[3][0],r[3][1],r[3][2],r[4][0],r[4][1],r[4][2],r[5][0],r[5][1],r[5][2]);
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[3][3],r[3][4],r[3][5],r[4][3],r[4][4],r[4][5],r[5][3],r[5][4],r[5][5]);
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[3][6],r[3][7],r[3][8],r[4][6],r[4][7],r[4][8],r[5][6],r[5][7],r[5][8]);
+    printf("------------\n");
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[6][0],r[6][1],r[6][2],r[7][0],r[7][1],r[7][2],r[8][0],r[8][1],r[8][2]);
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[6][3],r[6][4],r[6][5],r[7][3],r[7][4],r[7][5],r[8][3],r[8][4],r[8][5]);
+    printf("%c%c%c|%c%c%c|%c%c%c\n", r[6][6],r[6][7],r[6][8],r[7][6],r[7][7],r[7][8],r[8][6],r[8][7],r[8][8]);
+}
+int takieSame(char a, char b, char c) {
+    return ((a == b) && (a == c) && a!=' ');
+}
+char zwyciezca(char pola[]) {
+    for (int i = 0; i < 3; i++) {
+        if (takieSame(pola[i*3], pola[i*3+1], pola[i*3+2])) {
+            return pola[i*3];
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        if (takieSame(pola[i], pola[i+3], pola[i+6])) {
+            return pola[i];
+        }
+    }
+    if (takieSame(pola[0], pola[4], pola[8]) || takieSame(pola[2], pola[4], pola[6])) {
+        return pola[4];
+    }
+    int wolnePola = 0;
+    for (int i = 0; i < 9; i++) {
+        if (pola[i] == ' ') {
+            wolnePola++;
+        }
+    }
+    if (wolnePola == 0) {
+        return 'r';
+    } else {
+        return ' ';
+    }
+}
+int minimax(char pola[],int czyMaksymalizuje) {
+    switch(zwyciezca(pola)){
+        case CZLOWIEK: return -10;
+        case AI: return 10;
+        case 'r': return 0;
+    }
+    if (czyMaksymalizuje) {
+        int najlepszyWynik = -100;
+        for (int i = 0; i < 9; i++) {
+            if (pola[i] == ' ') {
+                pola[i] = AI;
+                int wynik = minimax(pola, 0);
+                pola[i] = ' ';
+                najlepszyWynik=wynik>najlepszyWynik ? wynik:najlepszyWynik;
+            }
+        }
+        return najlepszyWynik;
+    } else {
+        int najlepszyWynik = 100;
+        for (int i = 0; i < 9; i++) {
+            if (pola[i] == ' ') {
+                pola[i] = CZLOWIEK;
+                int wynik = minimax(pola, 1);
+                pola[i] = ' ';
+                najlepszyWynik=wynik<najlepszyWynik ? wynik:najlepszyWynik;
+            }
+        }
+        return najlepszyWynik;
+    }
+}
+int main()
+{
+    char ktoZaczyna;
+    printf("Wpisz 1, jeśli chcesz zacząć.\nWpisz 2, jeśli komputer ma zacząć.\n");
+    do{
+        scanf(" %c",&ktoZaczyna);
+    } while (ktoZaczyna!=49 && ktoZaczyna!=50);
+    char kolej = ktoZaczyna==1+'0' ? CZLOWIEK : AI;
+    char pola[9]={' ',' ',' ',' ',' ',' ',' ',' ',' '};
+    char ruch;
+    char win;
+    for(int i=0; i<9; i++) {
+        for(int j=0; j<9; j++){
+            if(j==4){
+                r[i][j]=i+'0';
+            } else {
+                r[i][j]=' ';
+            }
+        }
+    }
+    zaktualizujPlansze(pola);
+    int najlepszyWynik=-100;
+    while(1) {
+        najlepszyWynik=-100;
+        if(kolej==CZLOWIEK) {
+            do{
+                scanf(" %c",&ruch);
+            } while(pola[ruch-'0']!=' ' || ruch<48 || ruch>56);
+        } else {
+            for (int i = 0; i < 9; i++) {
+                if (pola[i] == ' ') {
+                    pola[i] = AI;
+                    int wynik = minimax(pola, 0);
+                    pola[i] = ' ';
+                    if (wynik > najlepszyWynik) {
+                        najlepszyWynik = wynik;
+                        ruch = i+'0';
+                    }
+                }
+            }
+        }
+        pola[ruch-'0']=kolej;
+        zaktualizujPlansze(pola);
+        if((win=zwyciezca(pola))!=' '){
+            break;
+        }
+        if(kolej==CZLOWIEK){
+            kolej=AI;
+        } else {
+            kolej=CZLOWIEK;
+        }
+    }
+    if(win=='r'){
+        printf("Remis\n");
+    } else {
+        printf("Wygrał gracz: %c\n",win);
+    }
+    return 0;
+}
